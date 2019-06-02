@@ -1,0 +1,118 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.selector-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 200px;
+}
+
+.selector-button {
+  flex: 1 1 auto;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+.selector-button:hover {
+  box-shadow: 0 0 2px 2px rgb(0, 153, 255);
+}
+
+.selector-puzzle {
+  flex: 8 1 auto;
+}
+
+.solution-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 200px;
+}
+
+.solution-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 4 1 auto;
+}
+
+.solution-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1 1 auto;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table, td {
+  border: 1px solid black;
+}
+
+tr {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+td {
+  display: flex;
+  padding: 0px;
+}
+
+td.active {
+  border: 1px solid orange;
+}
+
+.solution-button {
+  -webkit-appearance: none;
+  -webkit-transition: .2s;
+  transition: 
+    background-color .2s,
+    box-shadow .2s;
+  width: 80%;
+  height: 10%;
+  border-radius: 10px;
+  font-size: 28px;
+  background: rgba(179, 179, 179, 0.5);
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+.solution-button:hover {
+  background: rgba(179, 179, 179, 1);
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 1);
+}

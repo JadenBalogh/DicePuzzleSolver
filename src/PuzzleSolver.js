@@ -52,8 +52,8 @@ class PuzzleSolver {
     
     editTile(puzzle, x, y) {
         var result = puzzle.copy();
-        if (isPositionValid(result.layout, x, y)) {
-            if (isScoreValid(result.layout[x][y]+1)) {
+        if (this.isPositionValid(result.layout, x, y)) {
+            if (this.isScoreValid(result.layout[x][y]+1)) {
                 result.layout[x][y]++;
             } else {
                 result.layout[x][y] = 0;

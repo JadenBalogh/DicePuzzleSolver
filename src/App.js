@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import PuzzleSolver from './PuzzleSolver.js';
+import Puzzle from './Puzzle.js';
 import Puzzles from './PuzzleStructures.js';
 
 const EDIT_MODE = 0;
@@ -11,10 +12,13 @@ class PuzzleSelector extends React.Component {
     super(props);
     this.state = {
       structure: this.props.structures[0],
-      layout: new Puzzle(this.props.structures[0]),
+      puzzle: new Puzzle(this.props.structures[0]),
+      editMode: 0,
       solution: []
     };
     this.solver = new PuzzleSolver();
+    this.updateStructure = this.updateStructure.bind(this);
+    this.updateLayout =  this.updateLayout.bind(this);
     this.updateSolution = this.updateSolution.bind(this);
   }
 
@@ -36,16 +40,29 @@ class PuzzleSelector extends React.Component {
     TBD: How will it know which piece to light up to show the next move? 
   */
 
-  updateLayout(x, y) {
+  // CURRENT STRUGGLE: how to deal with updating the structure of the puzzle input while still using the layout to update it as well...
+  // SOLUTION: just update the layout in updateStructure you dummy! do that next. set the layout to the structure in updateStructure.
+  // now to figure out how to give those buttons active states...
+
+  updateStructure(e) {
+    var i = e.currentTarget.getAttribute('structureIndex');
+    this.setState({
+      structure: this.props.structures[i]
+    });
+  }
+
+  updateLayout(e) {
+    var row = e.currentTarget.getAttribute('row');
+    var col = e.currentTarget.getAttribute('col');
     var result = null;
     if (this.state.editMode === EDIT_MODE) {
-      
+      result = this.solver.editTile(this.state.puzzle, row, col);
     } else if (this.state.editMode === PRACTICE_MODE) {
-
+      result = this.solver.useTile(this.state.puzzle, row, col);
     }
 
     this.setState({
-      layout: result
+      puzzle: result
     });
   }
 
@@ -53,7 +70,7 @@ class PuzzleSelector extends React.Component {
     this.setState({
       solution: this.solver.solve(
         this.state.structure,
-        this.state.layout
+        this.state.puzzle
       )
     });
   }
@@ -62,10 +79,13 @@ class PuzzleSelector extends React.Component {
     return(
       <>
         <div className="selector-container">
-          <PuzzleSelectorList structures={this.props.structures} />
+          <PuzzleSelectorList 
+            structures={this.props.structures} 
+            clickHandler={this.updateStructure}
+          />
           <PuzzleInput 
-            structure={this.state.structure}
-            clickHandler={this.updateInput}
+            layout={this.state.puzzle.layout}
+            clickHandler={this.updateLayout}
           />
           <button 
             className="solution-button"
@@ -83,18 +103,28 @@ class PuzzleSelector extends React.Component {
 function PuzzleInput(props) {
   const createPuzzle = () => {
     var result = [];
-    for (var i = 0; i < props.structure.length; i++) {
+    for (var i = 0; i < props.layout.length; i++) {
       var cells = [];
-      for (var j = 0; j < props.structure[i].length; j++) {
-        if (layout[i][j] === -1) {
+      for (var j = 0; j < props.layout[i].length; j++) {
+        if (props.layout[i][j] === -1) {
           cells.push(
-            <td></td>
+            <td>
+              <div className="selector-puzzle-empty" />
+            </td>
           );
         } else {
           cells.push(
             <td>
-              <button onClick={(i, j) => props.clickHandler(i, j)}>
-                <img src={`/icons/dice${layout[i][j]}.png`} alt="dice" />
+              <button 
+                row={i} 
+                col={j} 
+                className="selector-puzzle-tile" 
+                onClick={(e) => props.clickHandler(e)}
+              >
+                <img 
+                  src={`/icons/dice${props.layout[i][j]}.png`} 
+                  alt="dice" 
+                />
               </button>
             </td>
           );
@@ -119,11 +149,16 @@ function PuzzleSelectorList(props) {
     var result = [];
     for (var i = 0; i < props.structures.length; i++) {
       result.push(
-        <img 
-          className="selector-button"
-          src={`/icons/puzzle${i}.png`}
-          alt={`Puzzle ${i}`}
-        />
+        <button
+          structureIndex={i}
+          className={`selector-button ${props.structures[i] === props.structure ? "active" : ""}`}
+          onClick={(e) => props.clickHandler(e)}
+        >
+          <img 
+            src={`/icons/puzzle${i}.png`}
+            alt={`Puzzle ${i}`}
+          />
+        </button>
       );
     }
     return result;

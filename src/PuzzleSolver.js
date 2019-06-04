@@ -27,7 +27,7 @@ class PuzzleSolver {
                 return this.graph.getPathToCurrent();
             }
             for (var x = 0; x < current.layout.length; x++) {
-                for (var y = 0; y < current[x].layout.length; y++) {
+                for (var y = 0; y < current.layout[x].length; y++) {
                     if (layout[x][y] === -1)
                         continue;
                     var next = this.useTile(current, x, y);

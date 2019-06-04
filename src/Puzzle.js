@@ -27,7 +27,15 @@ class Puzzle {
     }
 
     copy() {
-        return new Puzzle(this.layout);
+        var result = [];
+        for (var i = 0; i < this.layout.length; i++) {
+            var row = [];
+            for (var j = 0; j < this.layout[i].length; j++) {
+                row.push(this.layout[i][j]);
+            }
+            result.push(row);
+        }
+        return new Puzzle(result);
     }
 
     key() {
@@ -47,9 +55,11 @@ class Puzzle {
         for (var i = 0; i < this.layout.length; i++) {
             result += "[";
             for (var j = 0; j < this.layout[i].length; j++) {
-                if (this.layout[i][j] === -1) 
+                if (this.layout[i][j] === -1) {
                     result += "x";
-                result += this.layout[i][j];
+                } else {
+                    result += this.layout[i][j];
+                }
                 if (j !== this.layout[i].length - 1) {
                     result += ", ";
                 }

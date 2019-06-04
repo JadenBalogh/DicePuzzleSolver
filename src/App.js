@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import PuzzleSolver from './PuzzleSolver.js';
 import Puzzle from './Puzzle.js';
-import Puzzles from './PuzzleStructures.js';
+import Structures from './PuzzleStructures.js';
 
 const EDIT_MODE = 0;
 const PRACTICE_MODE = 1;
@@ -11,14 +11,16 @@ class PuzzleSelector extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      structure: this.props.structures[0],
-      puzzle: new Puzzle(this.props.structures[0]),
+      structure: this.props.structures[0].map(row => row.slice()),
+      puzzle: new Puzzle(this.props.structures[0].map(row => row.slice())),
       editMode: 0,
       solution: []
     };
     this.solver = new PuzzleSolver();
+    this.setEditMode = this.setEditMode.bind(this);
+    this.setPracticeMode = this.setPracticeMode.bind(this);
     this.updateStructure = this.updateStructure.bind(this);
-    this.updateLayout =  this.updateLayout.bind(this);
+    this.updatePuzzle =  this.updatePuzzle.bind(this);
     this.updateSolution = this.updateSolution.bind(this);
   }
 
@@ -44,16 +46,30 @@ class PuzzleSelector extends React.Component {
   // SOLUTION: just update the layout in updateStructure you dummy! do that next. set the layout to the structure in updateStructure.
   // now to figure out how to give those buttons active states...
 
+  setEditMode() {
+    this.setState({
+      editMode: EDIT_MODE
+    })
+  }
+
+  setPracticeMode() {
+    this.setState({
+      editMode: PRACTICE_MODE
+    })
+  }
+
   updateStructure(e) {
     var i = e.currentTarget.getAttribute('structureIndex');
     this.setState({
-      structure: this.props.structures[i]
+      structure: this.props.structures[i].map(row => row.slice()),
+      puzzle: new Puzzle(this.props.structures[i].map(row => row.slice())),
+      solution: []
     });
   }
 
-  updateLayout(e) {
-    var row = e.currentTarget.getAttribute('row');
-    var col = e.currentTarget.getAttribute('col');
+  updatePuzzle(e) {
+    var row = Number(e.currentTarget.getAttribute('row'));
+    var col = Number(e.currentTarget.getAttribute('col'));
     var result = null;
     if (this.state.editMode === EDIT_MODE) {
       result = this.solver.editTile(this.state.puzzle, row, col);
@@ -62,7 +78,8 @@ class PuzzleSelector extends React.Component {
     }
 
     this.setState({
-      puzzle: result
+      puzzle: result,
+      solution: []
     });
   }
 
@@ -70,7 +87,7 @@ class PuzzleSelector extends React.Component {
     this.setState({
       solution: this.solver.solve(
         this.state.structure,
-        this.state.puzzle
+        this.state.puzzle.layout
       )
     });
   }
@@ -79,22 +96,45 @@ class PuzzleSelector extends React.Component {
     return(
       <>
         <div className="selector-container">
-          <PuzzleSelectorList 
-            structures={this.props.structures} 
-            clickHandler={this.updateStructure}
-          />
-          <PuzzleInput 
-            layout={this.state.puzzle.layout}
-            clickHandler={this.updateLayout}
-          />
-          <button 
-            className="solution-button"
-            onClick={this.updateSolution}
-          >Solve</button> 
+          <div className="selector-button-container">
+            <p><u>Puzzle Layout</u></p>
+            <PuzzleSelectorList 
+              structures={this.props.structures} 
+              clickHandler={this.updateStructure}
+            />
+          </div>
+          <div className="selector-puzzle-container">
+            <PuzzleInput 
+              layout={this.state.puzzle.layout}
+              clickHandler={this.updatePuzzle}
+            />
+          </div>
+          <div className="selector-options-container">
+            <p><u>Options</u></p>
+            <button 
+              className={`ui-button ${this.state.editMode === EDIT_MODE ? "active" : ""}`}
+              onClick={this.setEditMode}
+            >
+              Edit Mode
+            </button>
+            <button 
+              className={`ui-button ${this.state.editMode === PRACTICE_MODE ? "active" : ""}`}
+              onClick={this.setPracticeMode}
+            >
+              Practice Mode
+            </button>
+            <button 
+              className="ui-button"
+              onClick={this.updateSolution}
+            >Solve</button> 
+          </div>
         </div>
-        <PuzzleSolution 
-          solution={this.state.solution}
-        />
+        <div className="solution-container">
+          <PuzzleList 
+            layout={this.state.puzzle.layout}
+            solution={this.state.solution}
+          />
+        </div>
       </>
     );
   }
@@ -109,7 +149,7 @@ function PuzzleInput(props) {
         if (props.layout[i][j] === -1) {
           cells.push(
             <td>
-              <div className="selector-puzzle-empty" />
+              <div className="puzzle-tile-empty" />
             </td>
           );
         } else {
@@ -151,7 +191,7 @@ function PuzzleSelectorList(props) {
       result.push(
         <button
           structureIndex={i}
-          className={`selector-button ${props.structures[i] === props.structure ? "active" : ""}`}
+          className={`selector-button`}
           onClick={(e) => props.clickHandler(e)}
         >
           <img 
@@ -166,23 +206,9 @@ function PuzzleSelectorList(props) {
   return createButtons();
 }
 
-class PuzzleSolution extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className="solution-container">
-        <PuzzleList 
-          solution={this.props.solution}
-        />
-      </div>
-    );
-  }
-}
-
 function PuzzleList(props) {
+  var prev = props.layout;
+
   const createPuzzle = (layout) => {
     var result = [];
     for (var i = 0; i < layout.length; i++) {
@@ -190,18 +216,24 @@ function PuzzleList(props) {
       for (var j = 0; j < layout[i].length; j++) {
         if (layout[i][j] === -1) {
           cells.push(
-            <td></td>
+            <td>
+              <div className="puzzle-tile-empty" />
+            </td>
           );
         } else {
           cells.push(
-            <td>
-              <img src={`/icons/dice${layout[i][j]}.png`} alt="dice" />
+            <td className={(layout[i][j] > prev[i][j]) ? "highlighted" : ""}>
+              <img 
+                src={`/icons/dice${layout[i][j]}.png`} 
+                alt="dice" 
+              />
             </td>
           );
         }
       }
       result.push(<tr>{cells}</tr>);
     }
+    prev = layout;
     return result;
   }
 
@@ -210,7 +242,7 @@ function PuzzleList(props) {
       <div className="solution-arrow">
         <img src="/icons/arrow.png" alt="arrow" />
       </div>
-      <div className="solution-box">
+      <div className="solution-puzzle">
         <table>
           {createPuzzle(layout)}
         </table>
@@ -221,10 +253,16 @@ function PuzzleList(props) {
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <PuzzleSelector structures={Puzzles} />
+    <div className="app">
+      <header className="app-header">
+        <h1>DDO Dice Puzzle Solver</h1>
       </header>
+      <div className="app-body"> 
+        <PuzzleSelector structures={Structures} />
+      </div>
+      <footer className="app-footer">
+        <p>Made by Furyflash of Thelanis.</p>
+      </footer>
     </div>
   );
 }

@@ -20,8 +20,8 @@ const Puzzle4 = [
   [2, 2, 2, 2]
 ];
 
-const Puzzles = [
+const Structures = [
   Puzzle1, Puzzle2, Puzzle3, Puzzle4
 ]
 
-export default Puzzles;
+export default Structures;

@@ -35,8 +35,15 @@
 
 img {
   max-width: 100%;
-  max-height: 100%;
   vertical-align: middle;
+}
+
+.title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 10%;
 }
 
 .title {
@@ -52,8 +59,7 @@ img {
   height: 50%;
 }
 
-.selector-button-container {
-  background: orange;
+.menu-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -62,70 +68,61 @@ img {
   height: 100%;
 }
 
-.selector-button {
+.menu-item-container {
+  display: flex;
+  flex-direction: column;
+  flex-flow: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 90%;
+}
+
+.menu-item {
+  width: 50%;
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.puzzle-type-button {
   -webkit-appearance: none;
   -webkit-transition: .2s;
-  transition: 
-    background-color .2s,
+  transition:
     box-shadow .2s;
-  flex-basis: 100%;
-  display: flex;
+  background: rgba(0, 0, 0, 0.5);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  filter: drop-shadow(0 0 2px 2px rgba(0, 0, 0, 0.5));
+  width: 100%;
   padding: 0;
   margin: 10px;
   border: none;
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
 }
 
-.selector-button:hover {
+.puzzle-type-button:hover {
   box-shadow: 0 0 2px 2px rgb(0, 153, 255);
 }
 
-.selector-button.active {
+.puzzle-type-button.active {
   box-shadow: 0 0 2px 2px rgb(255, 174, 0);
 }
 
-.selector-puzzle-container {
-  background: red;
+.menu-button-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
-  width: 60%;
-  height: 100%;
+  flex: 1;
+  width: 100%;
+  height: 40%;
 }
 
-.selector-puzzle {
-  background-color: #282c34;
-  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
-}
-
-.selector-puzzle-tile {
-  -webkit-appearance: none;
-  padding: 0;
-  border: none;
-}
-
-.selector-puzzle-tile img {
-  width: 64px;
-  height: 64px;
-}
-
-.puzzle-tile-empty {
-  float: none;
-  width: 64px;
-}
-
-.selector-options-container {
-  background: green;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 20%;
-  height: 100%;
-}
-
-.ui-button {
+.menu-button {
   -webkit-appearance: none;
   -webkit-transition: .2s;
   transition: 
@@ -141,13 +138,47 @@ img {
   outline: none;
 }
 
-.ui-button:hover {
+.menu-button:hover {
   background: rgba(179, 179, 179, 1);
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 1);
 }
 
+.menu-button.active {
+  background: rgb(54, 54, 54);
+  box-shadow: 0 0 2px 2px rgb(128, 0, 0);
+}
+
+.puzzle-input-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  height: 100%;
+}
+
+.puzzle-input {
+  background-color: #282c34;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+.puzzle-input-tile {
+  -webkit-appearance: none;
+  padding: 0;
+  border: none;
+}
+
+.puzzle-input-tile img {
+  width: 64px;
+  height: 64px;
+}
+
+.puzzle-input-tile-empty {
+  float: none;
+  width: 64px;
+}
+
 .solution-container {
-  background: yellow;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -157,13 +188,12 @@ img {
 }
 
 .solution-puzzle {
-  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
+  background-color: #282c34;
   display: flex;
-  /* width: 100%;
-  height: 50%; */
   padding: 0;
   margin: 10px;
   border: none;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
 }
 
 .solution-arrow {
@@ -173,7 +203,21 @@ img {
   flex-basis: 64px;
 }
 
+.puzzle-solution-tile {
+  max-width: 32px;
+  max-height: 32px;
+}
+
+.puzzle-solution-tile-empty {
+  float: none;
+  width: 32px;
+}
+
 table {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
   border-collapse: collapse;
 }
 
@@ -192,5 +236,5 @@ td {
 }
 
 td.highlighted {
-  border: 1px solid orange;
+  border: 1px solid white;
 }

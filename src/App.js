@@ -17,6 +17,7 @@ class PuzzleSelector extends React.Component {
       solution: []
     };
     this.solver = new PuzzleSolver();
+    this.resetPuzzle = this.resetPuzzle.bind(this);
     this.setEditMode = this.setEditMode.bind(this);
     this.setPracticeMode = this.setPracticeMode.bind(this);
     this.updateStructure = this.updateStructure.bind(this);
@@ -45,6 +46,13 @@ class PuzzleSelector extends React.Component {
   // CURRENT STRUGGLE: how to deal with updating the structure of the puzzle input while still using the layout to update it as well...
   // SOLUTION: just update the layout in updateStructure you dummy! do that next. set the layout to the structure in updateStructure.
   // now to figure out how to give those buttons active states...
+
+  resetPuzzle() {
+    this.setState({
+      puzzle: new Puzzle(this.state.structure),
+      solution: []
+    });
+  }
 
   setEditMode() {
     this.setState({
@@ -96,37 +104,56 @@ class PuzzleSelector extends React.Component {
     return(
       <>
         <div className="selector-container">
-          <div className="selector-button-container">
-            <p><u>Puzzle Layout</u></p>
-            <PuzzleSelectorList 
-              structures={this.props.structures} 
-              clickHandler={this.updateStructure}
-            />
+          <div className="menu-container">
+            <div className="title-container">
+              <p className="title">
+                <u>Puzzle Type</u>
+              </p>
+            </div>
+            <div className="menu-item-container">
+              <PuzzleTypeList 
+                structures={this.props.structures} 
+                clickHandler={this.updateStructure}
+              />
+            </div>
           </div>
-          <div className="selector-puzzle-container">
+          <div className="puzzle-input-container">
             <PuzzleInput 
               layout={this.state.puzzle.layout}
               clickHandler={this.updatePuzzle}
             />
           </div>
-          <div className="selector-options-container">
-            <p><u>Options</u></p>
-            <button 
-              className={`ui-button ${this.state.editMode === EDIT_MODE ? "active" : ""}`}
-              onClick={this.setEditMode}
-            >
-              Edit Mode
-            </button>
-            <button 
-              className={`ui-button ${this.state.editMode === PRACTICE_MODE ? "active" : ""}`}
-              onClick={this.setPracticeMode}
-            >
-              Practice Mode
-            </button>
-            <button 
-              className="ui-button"
-              onClick={this.updateSolution}
-            >Solve</button> 
+          <div className="menu-container">
+            <div className="title-container">
+              <p className="title">
+                <u>Mode</u>
+              </p>
+            </div>
+            <div className="menu-button-container">
+              <button 
+                className={`menu-button ${this.state.editMode === EDIT_MODE ? "active" : ""}`}
+                onClick={this.setEditMode}
+              >Edit</button>
+              <button 
+                className={`menu-button ${this.state.editMode === PRACTICE_MODE ? "active" : ""}`}
+                onClick={this.setPracticeMode}
+              >Practice</button>
+            </div>
+            <div className="title-container">
+              <p className="title">
+                <u>Options</u>
+              </p>
+            </div>
+            <div className="menu-button-container">
+              <button 
+                className="menu-button"
+                onClick={this.resetPuzzle}
+              >Reset</button> 
+              <button 
+                className="menu-button"
+                onClick={this.updateSolution}
+              >Solve</button> 
+            </div>
           </div>
         </div>
         <div className="solution-container">
@@ -149,7 +176,7 @@ function PuzzleInput(props) {
         if (props.layout[i][j] === -1) {
           cells.push(
             <td>
-              <div className="puzzle-tile-empty" />
+              <div className="puzzle-input-tile-empty" />
             </td>
           );
         } else {
@@ -158,7 +185,7 @@ function PuzzleInput(props) {
               <button 
                 row={i} 
                 col={j} 
-                className="selector-puzzle-tile" 
+                className="puzzle-input-tile" 
                 onClick={(e) => props.clickHandler(e)}
               >
                 <img 
@@ -176,7 +203,7 @@ function PuzzleInput(props) {
   }
 
   return (
-    <div className="selector-puzzle">
+    <div className="puzzle-input">
       <table>
         {createPuzzle()}
       </table>
@@ -184,21 +211,27 @@ function PuzzleInput(props) {
   );
 }
 
-function PuzzleSelectorList(props) {
+function PuzzleTypeList(props) {
   const createButtons = () => {
     var result = [];
     for (var i = 0; i < props.structures.length; i++) {
+      var img = {
+        backgroundImage: `url(/icons/puzzle${i}.png)`
+      };
       result.push(
-        <button
-          structureIndex={i}
-          className={`selector-button`}
-          onClick={(e) => props.clickHandler(e)}
-        >
-          <img 
-            src={`/icons/puzzle${i}.png`}
-            alt={`Puzzle ${i}`}
-          />
-        </button>
+        <div className="menu-item">
+          <button
+            style={img}
+            structureIndex={i}
+            className={`puzzle-type-button`}
+            onClick={(e) => props.clickHandler(e)}
+          >
+            {/* <img 
+              src={`/icons/puzzle${i}.png`}
+              alt={`Puzzle ${i}`}
+            /> */}
+          </button>
+        </div>
       );
     }
     return result;
@@ -217,13 +250,14 @@ function PuzzleList(props) {
         if (layout[i][j] === -1) {
           cells.push(
             <td>
-              <div className="puzzle-tile-empty" />
+              <div className="puzzle-solution-tile-empty" />
             </td>
           );
         } else {
           cells.push(
             <td className={(layout[i][j] > prev[i][j]) ? "highlighted" : ""}>
               <img 
+                className="puzzle-solution-tile"
                 src={`/icons/dice${layout[i][j]}.png`} 
                 alt="dice" 
               />

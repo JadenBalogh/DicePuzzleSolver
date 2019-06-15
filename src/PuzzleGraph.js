@@ -5,19 +5,31 @@ class PuzzleGraph {
         this.queue.push(this.head);
         this.visited = new Map();
         this.visited.set(this.head.puzzle.key(), true);
+        this.checks = [1];
         this.skipped = 0;
     }
 
     getNextInQueue() {
-        this.visited.set(this.queue[0].puzzle.key(), true);
+        this.queue[0].puzzle.getEquivalent().forEach(puzzle => {
+            this.visited.set(puzzle.key(), true);
+        });
         this.queue.shift();
         if (this.visited.get(this.queue[0].puzzle.key())) {
             this.queue.shift();
             this.skipped++;
         }
+        if (!this.checks[this.queue[0].level()]) {
+            this.checks.push(0);
+        }
+        this.checks[this.queue[0].level()]++;
+        // console.log(`Level ${this.queue[0].level()}`);
+        // this.queue[0].parent.puzzle.print();
+        // console.log("goes to:")
+        // this.queue[0].puzzle.print();
+        // console.log("");
         return this.queue[0].puzzle;
     }
-
+    
     getPathToCurrent() {
         console.log("skipped: " + this.skipped);
         var path = [];
@@ -27,6 +39,11 @@ class PuzzleGraph {
             current = current.parent;
         }
         path.reverse();
+        
+        for (var i = 0; i < this.checks.length; i++) {
+            console.log(`Level ${i} had ${this.checks[i]} checks.`);
+        }
+
         return path;
     }
 
@@ -43,6 +60,14 @@ class PuzzleNode {
         this.puzzle = puzzle;
         this.children = [];
         this.parent = null;
+    }
+
+    level() {
+        if (!this.parent) {
+            return 0;
+        }
+
+        return 1 + this.parent.level();
     }
 }
 

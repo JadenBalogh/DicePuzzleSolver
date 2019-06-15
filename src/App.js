@@ -7,6 +7,24 @@ import Structures from './PuzzleStructures.js';
 const EDIT_MODE = 0;
 const PRACTICE_MODE = 1;
 
+/* It's time for the next big thing: reverse solving.
+
+The core concept is as follows:
+1. Create a graph of steps working backward from the solution
+2. Map each puzzle visited by this graph to its respective node
+3. Check each step of the forward-moving graph against this map 
+  to see if any solution paths have been found
+
+The core problem to solve is "how do we work backwards by one step"?
+Here's how it can be done:
+1. Take a puzzle and xy coordinate
+2. We want to find what layout could have led to this puzzle
+  given that the tile at (x, y) was pressed
+3. The tile could have increased by a maximum of the number of tiles
+  around it
+
+*/
+
 class PuzzleSelector extends React.Component {
   constructor(props) {
     super(props);
@@ -24,29 +42,7 @@ class PuzzleSelector extends React.Component {
     this.updatePuzzle =  this.updatePuzzle.bind(this);
     this.updateSolution = this.updateSolution.bind(this);
   }
-
-  /*
-    OKAY, HERE'S WHAT'S UP:
-    The puzzle selector class is going to have 4 buttons for the 4 different puzzle types. This will update the structure of
-    the input puzzle. The user will then be able to toggle between "edit" or "practice" mode. 
-    
-    Edit mode will increase the number of an individual tile with each click, going back to 0 after 
-    it reaches 4. This will NOT affect adjacent tiles. 
-    
-    Practice mode will act as the puzzle normally acts, using the useTile() function to generate 
-    the appropriate next puzzle after each press.
-
-    When the user presses the "Solve" button, the current state of the input puzzle is passed into the solver as 
-    a layout array. This creates a PuzzleSolution component with the starting state as a prop. A PuzzleSolution ONLY
-    handles displaying the steps to the user.
-
-    TBD: How will it know which piece to light up to show the next move? 
-  */
-
-  // CURRENT STRUGGLE: how to deal with updating the structure of the puzzle input while still using the layout to update it as well...
-  // SOLUTION: just update the layout in updateStructure you dummy! do that next. set the layout to the structure in updateStructure.
-  // now to figure out how to give those buttons active states...
-
+  
   resetPuzzle() {
     this.setState({
       puzzle: new Puzzle(this.state.structure),

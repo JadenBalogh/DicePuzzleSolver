@@ -17,13 +17,14 @@ class PuzzleSolver {
         start.print();
         this.graph = new PuzzleGraph(start);
         var current = start;
+        var calls = 0;
         var moves = 0;
-        var stepCount = 0;
-        var levelCount = 0;
-        var level = 0;
+        var adds = 0;
         while (moves < 1000000) {
             if (solution.equals(current)) {
-                console.log("moves: " + moves);
+                console.log("useTile calls: " + calls);
+                console.log("queue adds: " + adds);
+                console.log("graph moves: " + moves);
                 return this.graph.getPathToCurrent();
             }
             for (var x = 0; x < current.layout.length; x++) {
@@ -31,19 +32,13 @@ class PuzzleSolver {
                     if (layout[x][y] === -1)
                         continue;
                     var next = this.useTile(current, x, y);
+                    calls++;
                     if (!next.equals(current)) {
                         this.graph.addNode(next);
-                        stepCount++;
+                        adds++;
                     }
                 }
             }
-            if (levelCount === 0) {
-                level++;
-                console.log(`level ${level} completed with ${stepCount} steps`);
-                levelCount = stepCount;
-                stepCount = 0;
-            }
-            levelCount--;
             current = this.graph.getNextInQueue();
             moves++;
         }
@@ -86,6 +81,10 @@ class PuzzleSolver {
             add one to score and subtract one from the next
             adjacent tile, then remove it from the list
         */
+        if (!this.isTileUsable(puzzle.layout, x, y)) {
+            return puzzle;
+        }
+
         var result = puzzle.copy();
     
         // Step 1
@@ -120,6 +119,15 @@ class PuzzleSolver {
         }
     
         return result;
+    }
+
+    isTileUsable(layout, x, y) {
+        return layout[x][y] < 4 && (
+            (this.isPositionValid(layout, x+1, y) && layout[x+1][y] > 0) ||
+            (this.isPositionValid(layout, x-1, y) && layout[x-1][y] > 0) ||
+            (this.isPositionValid(layout, x, y+1) && layout[x][y+1] > 0) ||
+            (this.isPositionValid(layout, x, y-1) && layout[x][y-1] > 0)
+        );
     }
   
     isPositionValid(layout, x, y) {

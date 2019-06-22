@@ -63,7 +63,6 @@ class Puzzle {
         [0, 1, 0]    [0, 1, 0]      [00, 01, 02]
         [4, 0, 3] => [3, 0, 4] key: [10, 11, 12]
         [0, x, 0]    [0, x, 0]      [20, 21, 22]
-
     */
     reflectV() {
         var result = [];
@@ -103,8 +102,8 @@ class Puzzle {
         var result = "";
         for (var i = 0; i < this.layout.length; i++) {
             for (var j = 0; j < this.layout[i].length; j++) {
-                if (this.layout[i][j] === -1) 
-                    continue;
+                if (this.layout[i][j] === -1)
+                    result += "x";
                 result += this.layout[i][j];
             }
         }

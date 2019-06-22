@@ -12,19 +12,15 @@ class PuzzleSolver {
     */
     solve(structure, layout) {
         var solution = new Puzzle(structure);
-        // sample start position
         var start = new Puzzle(layout);
-        start.print();
         this.graph = new PuzzleGraph(start);
         var current = start;
-        var calls = 0;
         var moves = 0;
-        var adds = 0;
         while (moves < 1000000) {
+            if (!current) {
+                return [];
+            }
             if (solution.equals(current)) {
-                console.log("useTile calls: " + calls);
-                console.log("queue adds: " + adds);
-                console.log("graph moves: " + moves);
                 return this.graph.getPathToCurrent();
             }
             for (var x = 0; x < current.layout.length; x++) {
@@ -32,17 +28,15 @@ class PuzzleSolver {
                     if (layout[x][y] === -1)
                         continue;
                     var next = this.useTile(current, x, y);
-                    calls++;
                     if (!next.equals(current)) {
                         this.graph.addNode(next);
-                        adds++;
                     }
                 }
             }
             current = this.graph.getNextInQueue();
             moves++;
         }
-        return null;
+        return [];
     }
     
     editTile(puzzle, x, y) {
@@ -137,6 +131,19 @@ class PuzzleSolver {
     isScoreValid(score) {
       return (score > 0 && score <= 4);
     }
+
+    isPuzzleValid(structure, layout) {
+        var expected = 0;
+        var actual = 0;
+        for (var i = 0; i < structure.length; i++) {
+            for (var j = 0; j < structure[i].length; j++) {
+                expected += structure[i][j];
+                actual += layout[i][j];
+            }
+        }
+        return expected === actual;
+    }
+
 }
 
 export default PuzzleSolver;

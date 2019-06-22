@@ -7,24 +7,6 @@ import Structures from './PuzzleStructures.js';
 const EDIT_MODE = 0;
 const PRACTICE_MODE = 1;
 
-/* It's time for the next big thing: reverse solving.
-
-The core concept is as follows:
-1. Create a graph of steps working backward from the solution
-2. Map each puzzle visited by this graph to its respective node
-3. Check each step of the forward-moving graph against this map 
-  to see if any solution paths have been found
-
-The core problem to solve is "how do we work backwards by one step"?
-Here's how it can be done:
-1. Take a puzzle and xy coordinate
-2. We want to find what layout could have led to this puzzle
-  given that the tile at (x, y) was pressed
-3. The tile could have increased by a maximum of the number of tiles
-  around it
-
-*/
-
 class PuzzleSelector extends React.Component {
   constructor(props) {
     super(props);
@@ -32,7 +14,9 @@ class PuzzleSelector extends React.Component {
       structure: this.props.structures[0].map(row => row.slice()),
       puzzle: new Puzzle(this.props.structures[0].map(row => row.slice())),
       editMode: 0,
-      solution: []
+      valid: true,
+      solution: [],
+      noSolutions: false
     };
     this.solver = new PuzzleSolver();
     this.resetPuzzle = this.resetPuzzle.bind(this);
@@ -46,7 +30,9 @@ class PuzzleSelector extends React.Component {
   resetPuzzle() {
     this.setState({
       puzzle: new Puzzle(this.state.structure),
-      solution: []
+      valid: true,
+      solution: [],
+      noSolutions: false
     });
   }
 
@@ -67,7 +53,9 @@ class PuzzleSelector extends React.Component {
     this.setState({
       structure: this.props.structures[i].map(row => row.slice()),
       puzzle: new Puzzle(this.props.structures[i].map(row => row.slice())),
-      solution: []
+      valid: true,
+      solution: [],
+      noSolutions: false
     });
   }
 
@@ -83,16 +71,20 @@ class PuzzleSelector extends React.Component {
 
     this.setState({
       puzzle: result,
-      solution: []
+      valid: this.solver.isPuzzleValid(this.state.structure, result.layout),
+      solution: [],
+      noSolutions: false
     });
   }
 
   updateSolution() {
+    var result = this.solver.solve(
+      this.state.structure,
+      this.state.puzzle.layout
+    );
     this.setState({
-      solution: this.solver.solve(
-        this.state.structure,
-        this.state.puzzle.layout
-      )
+      solution: result,
+      noSolutions: result.length === 0
     });
   }
 
@@ -118,6 +110,9 @@ class PuzzleSelector extends React.Component {
               layout={this.state.puzzle.layout}
               clickHandler={this.updatePuzzle}
             />
+            <p className={`puzzle-input-text ${!this.state.valid ? "active" : ""}`}>
+              Puzzle state is invalid!
+            </p>
           </div>
           <div className="menu-container">
             <div className="title-container">
@@ -153,6 +148,9 @@ class PuzzleSelector extends React.Component {
           </div>
         </div>
         <div className="solution-container">
+          <h2 className={`solution-text ${this.state.noSolutions ? "active" : ""}`}>
+            No Solutions!
+          </h2>
           <PuzzleList 
             layout={this.state.puzzle.layout}
             solution={this.state.solution}
@@ -285,7 +283,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>DDO Dice Puzzle Solver</h1>
+        <h1>DDO "Smash and Burn" Dice Puzzle Solver</h1>
       </header>
       <div className="app-body"> 
         <PuzzleSelector structures={Structures} />

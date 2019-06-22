@@ -3,6 +3,9 @@ import Puzzle from './Puzzle.js';
 
 // Contains graph of puzzle, findPaths() method and solution output code
 class PuzzleSolver {
+    constructor(useAlternatePriority) {
+        this.useAlternatePriority = useAlternatePriority;
+    }
     /* ALGORITHM
       1. Create a new graph-queue with the starting
         puzzle as the head
@@ -102,7 +105,15 @@ class PuzzleSolver {
     
         // Step 2
         adj = adj.sort((a,b) => {
-            return b[2] - a[2];
+            if (b[2] !== a[2]) {
+                return b[2] - a[2];
+            } else {
+                if (this.useAlternatePriority) {
+                    return this.getPriorityAlt(b[0], b[1]) - this.getPriorityAlt(a[0], a[1]);
+                } else {
+                    return this.getPriority(b[0], b[1]) - this.getPriority(a[0], a[1]);
+                }
+            }
         });
     
         // Step 3
@@ -113,6 +124,24 @@ class PuzzleSolver {
         }
     
         return result;
+    }
+
+    getPriority(x, y) {
+        var order = [
+            [6, 5, 4],
+            [1, 2, 3],
+            [7, 8, 9]
+        ];
+        return order[x][y];
+    }
+
+    getPriorityAlt(x, y) {
+        var order = [
+            [6, 5, 2],
+            [1, 4, 3],
+            [7, 8, 9]
+        ];
+        return order[x][y];
     }
 
     isTileUsable(layout, x, y) {

@@ -148,7 +148,7 @@ img {
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 1);
 }
 
-.puzzle-input-container {
+.input-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -157,35 +157,67 @@ img {
   height: 100%;
 }
 
-.puzzle-input {
+.input-puzzle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 80%;
+}
+
+.input-puzzle {
   background-color: #282c34;
   box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.5);
 }
 
-.puzzle-input-tile {
-  -webkit-appearance: none;
+.input-puzzle-tile {
   padding: 0;
   border: none;
 }
 
-.puzzle-input-tile img {
+.input-puzzle-tile img {
   width: 64px;
   height: 64px;
 }
 
-.puzzle-input-tile-empty {
+.input-puzzle-tile-empty {
   float: none;
   width: 64px;
 }
 
-.puzzle-input-text {
+.input-text-container {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 10%;
+}
+
+.input-text {
   color: red;
   visibility: hidden;
 }
 
-.puzzle-input-text.active {
+.input-text.active {
   visibility: visible;
+}
+
+.input-checkbox-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 10%;
+}
+
+.input-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+}
+
+.input-checkbox-text {
+  color: white;
 }
 
 .solution-container {

@@ -13,18 +13,29 @@ class PuzzleSelector extends React.Component {
     this.state = {
       structure: this.props.structures[0].map(row => row.slice()),
       puzzle: new Puzzle(this.props.structures[0].map(row => row.slice())),
+      useAlternatePriority: false,
       editMode: 0,
       valid: true,
       solution: [],
       noSolutions: false
     };
-    this.solver = new PuzzleSolver();
+    this.solver = new PuzzleSolver(false);
+    this.swapPriority = this.swapPriority.bind(this);
     this.resetPuzzle = this.resetPuzzle.bind(this);
     this.setEditMode = this.setEditMode.bind(this);
     this.setPracticeMode = this.setPracticeMode.bind(this);
     this.updateStructure = this.updateStructure.bind(this);
     this.updatePuzzle =  this.updatePuzzle.bind(this);
     this.updateSolution = this.updateSolution.bind(this);
+  }
+
+  swapPriority(e) {
+    var result = e.currentTarget.checked;
+    this.setState({
+      useAlternatePriority: result
+    });
+    this.solver = new PuzzleSolver(this.state.useAlternatePriority);
+    this.updateSolution();
   }
   
   resetPuzzle() {
@@ -78,6 +89,9 @@ class PuzzleSelector extends React.Component {
   }
 
   updateSolution() {
+    if (this.state.puzzle.equals(new Puzzle(this.state.structure))) {
+      return;
+    }
     var result = this.solver.solve(
       this.state.structure,
       this.state.puzzle.layout
@@ -105,14 +119,29 @@ class PuzzleSelector extends React.Component {
               />
             </div>
           </div>
-          <div className="puzzle-input-container">
-            <PuzzleInput 
-              layout={this.state.puzzle.layout}
-              clickHandler={this.updatePuzzle}
-            />
-            <p className={`puzzle-input-text ${!this.state.valid ? "active" : ""}`}>
-              Puzzle state is invalid!
-            </p>
+          <div className="input-container">
+            <div className="input-puzzle-container">
+              <PuzzleInput 
+                layout={this.state.puzzle.layout}
+                clickHandler={this.updatePuzzle}
+              />
+            </div>
+            <div className="input-text-container">
+              <p className={`input-text ${!this.state.valid ? "active" : ""}`}>
+                Puzzle state is invalid!
+              </p>
+            </div>
+            <div className="input-checkbox-container">
+              <input
+                className="input-checkbox"
+                type="checkbox"
+                checked={this.state.useAlternatePriority}
+                onChange={this.swapPriority}
+              />
+              <p className="input-checkbox-text">
+                Use alternate tile priority
+              </p>
+            </div>
           </div>
           <div className="menu-container">
             <div className="title-container">
@@ -170,7 +199,7 @@ function PuzzleInput(props) {
         if (props.layout[i][j] === -1) {
           cells.push(
             <td>
-              <div className="puzzle-input-tile-empty" />
+              <div className="input-puzzle-tile-empty" />
             </td>
           );
         } else {
@@ -179,7 +208,7 @@ function PuzzleInput(props) {
               <button 
                 row={i} 
                 col={j} 
-                className="puzzle-input-tile" 
+                className="input-puzzle-tile" 
                 onClick={(e) => props.clickHandler(e)}
               >
                 <img 
@@ -197,7 +226,7 @@ function PuzzleInput(props) {
   }
 
   return (
-    <div className="puzzle-input">
+    <div className="input-puzzle">
       <table>
         {createPuzzle()}
       </table>

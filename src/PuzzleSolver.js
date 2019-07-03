@@ -3,9 +3,6 @@ import Puzzle from './Puzzle.js';
 
 // Contains graph of puzzle, findPaths() method and solution output code
 class PuzzleSolver {
-    constructor(useAlternatePriority) {
-        this.useAlternatePriority = useAlternatePriority;
-    }
     /* ALGORITHM
       1. Create a new graph-queue with the starting
         puzzle as the head
@@ -13,7 +10,7 @@ class PuzzleSolver {
         and check if any one is the solution
       3. Move to the next object in the queue, repeat
     */
-    solve(structure, layout) {
+    solve(structure, layout, priority) {
         var solution = new Puzzle(structure);
         var start = new Puzzle(layout);
         this.graph = new PuzzleGraph(start);
@@ -30,7 +27,7 @@ class PuzzleSolver {
                 for (var y = 0; y < current.layout[x].length; y++) {
                     if (layout[x][y] === -1)
                         continue;
-                    var next = this.useTile(current, x, y);
+                    var next = this.useTile(current, x, y, priority);
                     if (!next.equals(current)) {
                         this.graph.addNode(next);
                     }
@@ -67,7 +64,7 @@ class PuzzleSolver {
         to reach 4, starting with the tiles with 
         the highest scores
     */
-    useTile(puzzle, x, y) {
+    useTile(puzzle, x, y, priority) {
         /* STEPS
             1. save each neighbour into a map where
             the key is its position and the value is its
@@ -108,11 +105,7 @@ class PuzzleSolver {
             if (b[2] !== a[2]) {
                 return b[2] - a[2];
             } else {
-                if (this.useAlternatePriority) {
-                    return this.getPriorityAlt(b[0], b[1]) - this.getPriorityAlt(a[0], a[1]);
-                } else {
-                    return this.getPriority(b[0], b[1]) - this.getPriority(a[0], a[1]);
-                }
+                return priority[b[0]][b[1]] - priority[a[0]][a[1]];
             }
         });
     
@@ -124,24 +117,6 @@ class PuzzleSolver {
         }
     
         return result;
-    }
-
-    getPriority(x, y) {
-        var order = [
-            [6, 5, 4],
-            [1, 2, 3],
-            [7, 8, 9]
-        ];
-        return order[x][y];
-    }
-
-    getPriorityAlt(x, y) {
-        var order = [
-            [6, 5, 2],
-            [1, 4, 3],
-            [7, 8, 9]
-        ];
-        return order[x][y];
     }
 
     isTileUsable(layout, x, y) {

@@ -3,6 +3,8 @@ import './App.css';
 import PuzzleSolver from './PuzzleSolver.js';
 import Puzzle from './Puzzle.js';
 import Structures from './PuzzleStructures.js';
+import { Priorities, AltPriorities } from './PuzzlePriorities.js';
+import { throwStatement } from '@babel/types';
 
 const EDIT_MODE = 0;
 const PRACTICE_MODE = 1;
@@ -13,7 +15,9 @@ class PuzzleSelector extends React.Component {
     this.state = {
       structure: this.props.structures[0].map(row => row.slice()),
       puzzle: new Puzzle(this.props.structures[0].map(row => row.slice())),
-      useAlternatePriority: false,
+      useAltPriority: false,
+      priority: this.props.priorities[0].map(row => row.slice()),
+      altPriority: this.props.altPriorities[0].map(row => row.slice()),
       editMode: 0,
       valid: true,
       solution: [],
@@ -27,15 +31,15 @@ class PuzzleSelector extends React.Component {
     this.updateStructure = this.updateStructure.bind(this);
     this.updatePuzzle =  this.updatePuzzle.bind(this);
     this.updateSolution = this.updateSolution.bind(this);
+    this.redoSolution = this.redoSolution.bind(this);
   }
 
   swapPriority(e) {
     var result = e.currentTarget.checked;
-    this.setState({
-      useAlternatePriority: result
-    });
-    this.solver = new PuzzleSolver(this.state.useAlternatePriority);
-    this.updateSolution();
+    this.setState(
+      { useAltPriority: result },
+      this.redoSolution
+    );
   }
   
   resetPuzzle() {
@@ -64,6 +68,8 @@ class PuzzleSelector extends React.Component {
     this.setState({
       structure: this.props.structures[i].map(row => row.slice()),
       puzzle: new Puzzle(this.props.structures[i].map(row => row.slice())),
+      priority: this.props.priorities[i].map(row => row.slice()),
+      altPriority: this.props.altPriorities[i].map(row => row.slice()),
       valid: true,
       solution: [],
       noSolutions: false
@@ -77,7 +83,9 @@ class PuzzleSelector extends React.Component {
     if (this.state.editMode === EDIT_MODE) {
       result = this.solver.editTile(this.state.puzzle, row, col);
     } else if (this.state.editMode === PRACTICE_MODE) {
-      result = this.solver.useTile(this.state.puzzle, row, col);
+      var priority = this.state.useAltPriority ? 
+        this.state.altPriority : this.state.priority;
+      result = this.solver.useTile(this.state.puzzle, row, col, priority);
     }
 
     this.setState({
@@ -92,14 +100,23 @@ class PuzzleSelector extends React.Component {
     if (this.state.puzzle.equals(new Puzzle(this.state.structure))) {
       return;
     }
+    var priority = this.state.useAltPriority ? 
+      this.state.altPriority : this.state.priority;
     var result = this.solver.solve(
       this.state.structure,
-      this.state.puzzle.layout
+      this.state.puzzle.layout,
+      priority
     );
     this.setState({
       solution: result,
       noSolutions: result.length === 0
     });
+  }
+
+  redoSolution() {
+    if (this.state.solution.length !== 0) {
+      this.updateSolution();
+    }
   }
 
   render() {
@@ -135,7 +152,7 @@ class PuzzleSelector extends React.Component {
               <input
                 className="input-checkbox"
                 type="checkbox"
-                checked={this.state.useAlternatePriority}
+                checked={this.state.useAltPriority}
                 onChange={this.swapPriority}
               />
               <p className="input-checkbox-text">
@@ -248,12 +265,7 @@ function PuzzleTypeList(props) {
             structureIndex={i}
             className={`puzzle-type-button`}
             onClick={(e) => props.clickHandler(e)}
-          >
-            {/* <img 
-              src={`/icons/puzzle${i}.png`}
-              alt={`Puzzle ${i}`}
-            /> */}
-          </button>
+          />
         </div>
       );
     }
@@ -315,7 +327,11 @@ function App() {
         <h1>DDO "Smash and Burn" Dice Puzzle Solver</h1>
       </header>
       <div className="app-body"> 
-        <PuzzleSelector structures={Structures} />
+        <PuzzleSelector 
+          structures={Structures} 
+          priorities={Priorities}
+          altPriorities={AltPriorities}
+        />
       </div>
       <footer className="app-footer">
         <p>Made by Furyflash of Thelanis.</p>

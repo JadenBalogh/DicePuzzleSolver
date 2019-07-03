@@ -334,7 +334,7 @@ function App() {
         />
       </div>
       <footer className="app-footer">
-        <p>Made by Furyflash of Thelanis.</p>
+        <p>Made by Furyflash of Thelanis (Dungeons and Dragons Online). Note: All solutions assume facing East in-game.</p>
       </footer>
     </div>
   );

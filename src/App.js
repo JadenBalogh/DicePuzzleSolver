@@ -4,7 +4,6 @@ import PuzzleSolver from './PuzzleSolver.js';
 import Puzzle from './Puzzle.js';
 import Structures from './PuzzleStructures.js';
 import { Priorities, AltPriorities } from './PuzzlePriorities.js';
-import { throwStatement } from '@babel/types';
 
 const EDIT_MODE = 0;
 const PRACTICE_MODE = 1;
